@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Check-in v7</title>
+<style>
+:root{--bg:#090a0b;--card:#151618;--card2:#202125;--text:#f5f5f7;--muted:#96979f;--accent:#ff5a55;--accent2:#ff6b5f;--green:#30d158;--yellow:#f2c94c;--line:#303136}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:linear-gradient(180deg,#08090a 0%,#0b0c0e 100%);color:var(--text);font:15px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding-bottom:88px}
+button,input,textarea,select{font:inherit}
+button{border:0;border-radius:14px;padding:11px 14px;background:var(--card2);color:var(--text);font-weight:650;cursor:pointer}
+button:active{transform:scale(.98)}button.active,.primary{background:var(--accent)}button:disabled{opacity:.45;cursor:not-allowed}
+.wrap{max-width:680px;margin:auto;padding:14px 16px}
+main.wrap{padding-top:14px}
+h1{font-size:27px;margin:4px 0}h2{font-size:18px;margin:0 0 10px}h3{font-size:15px;margin:0 0 8px}
+.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}
+.card{background:linear-gradient(180deg,#17181a,#151618);border:1px solid #343539;border-radius:22px;padding:16px;margin:12px 0;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.metric{font-size:25px;font-weight:800}.bar{height:8px;background:#292a2e;border-radius:99px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ff6b63);border-radius:99px}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.pill{display:inline-block;padding:7px 11px;border-radius:99px;background:#292a2e;font-size:12px;white-space:nowrap}.ok{color:var(--green)}.warn{color:var(--yellow)}.danger{color:#ff7772}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+select,input[type=number]{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px}
+.hidden{display:none}
+.task{display:flex;gap:13px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--line)}.task:last-child{border:0}
+.task input{width:20px;height:20px;accent-color:var(--green);margin-top:2px;flex:none}.done{text-decoration:line-through;color:#85858d}
+.task-main{flex:1;min-width:0}.task-title{font-size:16px;line-height:1.25}.task-meta{font-size:12px;color:var(--muted);margin-top:4px}.task-time{flex:none;align-self:center}
+.exercise{padding:13px 0;border-bottom:1px solid var(--line)}.exercise:last-child{border:0}.exercise b{font-size:16px}.exercise .dose{font-size:13px;color:var(--muted);margin-top:4px}
+.daynav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 12px}
+.daynav button{width:46px;height:46px;padding:0;border-radius:15px;font-size:24px;background:#202125}
+.day-title{text-align:center}.day-title b{font-size:18px}.day-title .sub{font-size:13px;color:var(--muted);margin-top:3px}
+.hero-progress{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:2px}.hero-left{min-width:0}.hero-left .eyebrow{font-size:13px;color:var(--muted);margin-bottom:4px}.hero-left .big{font-size:29px;font-weight:800;line-height:1.05}.hero-left .caption{font-size:13px;color:var(--muted);margin-top:6px}
+.progress-ring{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) var(--progress,0%),#2a2b2f 0);position:relative;flex:none}.progress-ring:after{content:"";position:absolute;inset:8px;border-radius:50%;background:#151618}.progress-ring span{position:relative;z-index:1;font-weight:750;font-size:17px}
+.new-head{display:flex;align-items:center;gap:10px;margin-bottom:4px}.new-head .emoji{font-size:20px}.new-head h2{margin:0;font-size:19px}.new-sub{font-size:12px;color:var(--muted);margin:0 0 4px 30px}
+.stamina-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.stamina-title{display:flex;align-items:center;gap:10px}.stamina-title h2{margin:0;font-size:19px}
+textarea{font-family:inherit}
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;height:72px;z-index:40;background:rgba(10,11,12,.96);backdrop-filter:blur(18px);border-top:1px solid #25262a;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 680px)/2 + 18px));}
+.nav-today{display:flex;flex-direction:column;align-items:center;gap:2px;background:transparent;padding:6px 16px;color:var(--accent);font-size:12px}.nav-today .ico{font-size:24px;line-height:1}
+.nav-menu{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#202125;font-size:25px;padding:0}
+.menu-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:50;display:none;align-items:flex-end}.menu-backdrop.open{display:flex}
+.menu-sheet{width:min(680px,100%);margin:0 auto;background:#17181b;border:1px solid #303136;border-bottom:0;border-radius:28px 28px 0 0;padding:10px 16px 18px;box-shadow:0 -18px 50px rgba(0,0,0,.45);max-height:82vh;overflow:auto}
+.sheet-handle{width:44px;height:5px;border-radius:99px;background:#77787e;margin:2px auto 14px}.sheet-title{font-size:12px;letter-spacing:.08em;color:var(--muted);margin:0 4px 8px}.menu-list{background:#202125;border-radius:18px;overflow:hidden}.menu-item{width:100%;text-align:left;margin:0;background:transparent;border:0;border-bottom:1px solid #34353a;padding:14px 12px;border-radius:0;display:flex;align-items:center;gap:13px}.menu-item:last-child{border-bottom:0}.menu-item:hover{background:#28292d}.menu-icon{width:28px;text-align:center;font-size:21px}.menu-copy{flex:1}.menu-copy b{font-size:16px}.menu-copy .small{margin-top:2px}
+.section-label{font-size:11px;color:var(--muted);letter-spacing:.08em;margin:18px 4px 7px}
+table{width:100%;border-collapse:collapse}td,th{padding:9px 6px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}
+.compact-progress{margin-top:10px}.footer-note{text-align:center;color:var(--muted);font-size:11px;margin:18px 0}
+@media(max-width:650px){.grid,.grid3{grid-template-columns:1fr}.wrap{padding:12px}.metric{font-size:22px}.card{border-radius:20px}.hero-left .big{font-size:27px}}
+</style>
+</head>
+<body>
+<header style="display:none"></header>
+
+<div id="menuBackdrop" class="menu-backdrop" onclick="if(event.target===this)toggleMenu(false)">
+  <aside class="menu-sheet" aria-label="Study Check-in menu">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">STUDY CHECK-IN</div>
+    <div class="menu-list">
+      <button class="menu-item" onclick="openSection('progress')"><span class="menu-icon">▥</span><span class="menu-copy"><b>Progress</b><div class="small">View your overall progress</div></span><span>›</span></button>
+      <button class="menu-item" onclick="openSection('plan')"><span class="menu-icon">□</span><span class="menu-copy"><b>Full Plan</b><div class="small">See the complete 142-day plan</div></span><span>›</span></button>
+      <button class="menu-item" onclick="openSection('today')"><span class="menu-icon">🏃</span><span class="menu-copy"><b>Stamina Plan</b><div class="small">View the 60-day progression</div></span><span>›</span></button>
+      <button class="menu-item" onclick="openSection('plan')"><span class="menu-icon">▤</span><span class="menu-copy"><b>Daily History</b><div class="small">Review past study days</div></span><span>›</span></button>
+      <button class="menu-item" onclick="openSection('settings')"><span class="menu-icon">⚙</span><span class="menu-copy"><b>Settings</b><div class="small">Customize and manage data</div></span><span>›</span></button>
+      <button class="menu-item" onclick="exportData();toggleMenu(false)"><span class="menu-icon">⇩</span><span class="menu-copy"><b>Export Data</b><div class="small">Back up your progress</div></span><span>›</span></button>
+      <button class="menu-item" onclick="document.getElementById('imp').click();toggleMenu(false)"><span class="menu-icon">⇧</span><span class="menu-copy"><b>Import Data</b><div class="small">Restore from backup</div></span><span>›</span></button>
+    </div>
+  </aside>
+</div>
+
+<main class="wrap">
+<section id="today"></section>
+<section id="progress" class="hidden"></section>
+<section id="plan" class="hidden"></section>
+<section id="settings" class="hidden"></section>
+</main>
+
+<nav class="bottom-nav" aria-label="Bottom navigation">
+  <button class="nav-today" onclick="openSection('today')"><span class="ico">⌂</span><span>Today</span></button>
+  <button class="nav-menu" onclick="toggleMenu(true)" aria-label="Open menu">☰</button>
+</nav>
+
+<script>
+const KEY='study_checkin_v7';
+const LEGACY_KEY='study_checkin_v1';
+const aptitude=[
+['Percentage','percentage',375],['Ratio & Proportion','ratio',510],['Average','average',486],
+['Mixture & Allegation','mixture',493],['Ages','ages',347],['Partnership','partnership',356],
+['Profit, Loss & Discount','pld',630],['SI & CI','sici',870],['Time & Work','tw',488],
+['Pipes & Cistern','pipes',342],['Time, Speed & Distance','tsd',598],['Trains','trains',376],
+['Boat & Stream','boat',375],['Permutation & Combination','pnc',370],['Probability','prob',367],['Mensuration','mens',528]
+];
+// Aptitude is allocated in 45-minute new-learning segments while the exact total remains tracked cumulatively.
+const gkBooks=[
+['Assam History 1',70,7],['Assam History 2',40,7],['Indian Geography 1',70,7],
+['Indian Geography 2',40,7],['Assam Geography 1',80,7],['Assam Geography 2',16,7],
+['Modern History',64,7],['Ancient History',40,7],['Polity',80,3],['Static GK',240,3],['MCQ Notebook',90,3]
+];
+const learned=['Number System','Simplification','Quadratic Equation','Number Series','Percentage (learned half)'];
+function fresh(){
+ return {startDay:1, actualStudyDay:1, completed:{}, actualMin:{}, notes:{}, weak:[], days:{}, created:new Date().toISOString()};
+}
+let S=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem(LEGACY_KEY)||'null')||fresh();
+
+function save(){localStorage.setItem(KEY,JSON.stringify(S));const el=document.getElementById('saveState');if(el)el.textContent='Saved locally';}
+function esc(x){return String(x).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function key(day,id){return `d${day}_${id}`;}
+function checked(day,id){return !!S.completed[key(day,id)]}
+function pct(a,b){return b?Math.min(100,Math.round(a/b*100)):0}
+function studyDay(){return Math.max(1,Math.min(142,S.actualStudyDay||1));}
+function dayStatus(day){
+ let vals=Object.keys(S.completed).filter(k=>k.startsWith('d'+day+'_')).map(k=>S.completed[k]);
+ if(!vals.length)return 'planned';
+ return vals.every(Boolean)?'complete':'partial';
+}
+const APT_NEW_MIN=45;
+const NEW_TOTAL_MIN=84;
+const VOCAB_MIN=10;
+const ENGLISH_MIN=12;
+const GK_NORMAL_MIN=17;
+
+const APT_TOTAL_MIN=7511;
+function aptNewForDay(d){
+ if(d<=3)return null;
+ const mins=(d-4)*APT_NEW_MIN;
+ if(mins>=APT_TOTAL_MIN)return null;
+ let cumulative=0;
+ for(const [name,id,topicMin] of aptitude){
+   if(mins<cumulative+topicMin){
+     const offset=mins-cumulative;
+     const segmentMin=Math.min(APT_NEW_MIN,topicMin-offset,APT_TOTAL_MIN-mins);
+     return {name,id,index:Math.floor(offset/APT_NEW_MIN),days:Math.ceil(topicMin/APT_NEW_MIN),minutes:segmentMin};
+   }
+   cumulative+=topicMin;
+ }
+ return null;
+}
+function aptCompletedStudyDay(){ return Math.ceil(APT_TOTAL_MIN/APT_NEW_MIN)+3; }
+function gkPagesByDay(d){
+ let pages=0;
+ for(let i=1;i<d;i++) pages += aptNewForDay(i) ? 3 : 10;
+ return Math.min(830,pages);
+}
+function gkTarget(d){ return aptNewForDay(d) ? 3 : 10; }
+function gkRange(d){
+ let before=gkPagesByDay(d), target=gkTarget(d);
+ let start=before+1,end=Math.min(830,before+target);
+ if(start>end)return 'First pass complete';
+ function locate(p){let acc=0;for(const [name,total] of gkBooks){if(p<=acc+total)return [name,p-acc];acc+=total}return ['Complete',0]}
+ let a=locate(start), b=locate(end);
+ return a[0]===b[0]?`${a[0]} — pages ${a[1]}–${b[1]}`:`${a[0]} — page ${a[1]} onward → ${b[0]} — page ${b[1]}`;
+}
+function task(day,id,title,meta,time=''){
+ let ck=checked(day,id);
+ return `<div class="task"><input type="checkbox" ${ck?'checked':''} onchange="toggle('${key(day,id)}',this.checked)"><div class="task-main"><div class="task-title ${ck?'done':''}"><b>${esc(title)}</b></div><div class="task-meta">${esc(meta)}</div></div>${time?`<span class="pill task-time">${esc(time)}</span>`:''}</div>`;
+}
+function toggle(k,v){S.completed[k]=v;save();render();}
+
+function staminaPlan(d){
+ const day=Math.min(60,Math.max(1,d));
+ if(day<=7)return {day,walk:20,skip:"None",push:"Wall push-ups: 2 × 6",sit:"Chair-assisted sit-ups: 2 × 5",plank:"2 × 10 sec",upper:"Arm circles: 2 × 20 sec"};
+ if(day<=14)return {day,walk:20,skip:"None",push:"Wall push-ups: 2 × 8",sit:"Chair-assisted sit-ups: 2 × 6",plank:"2 × 15 sec",upper:"Wall shoulder taps: 2 × 6/side"};
+ if(day<=21)return {day,walk:18,skip:"3 × 20 sec • easy pace",push:"Incline push-ups: 2 × 6",sit:"Sit-ups: 2 × 6",plank:"2 × 15 sec",upper:"Standing arm raises: 2 × 10"};
+ if(day<=30)return {day,walk:17,skip:"3 × 30 sec • easy pace",push:"Incline push-ups: 2 × 8",sit:"Sit-ups: 2 × 8",plank:"2 × 20 sec",upper:"Wall shoulder taps: 2 × 8/side"};
+ if(day<=40)return {day,walk:16,skip:"4 × 30 sec • easy/moderate",push:"Incline push-ups: 3 × 8",sit:"Sit-ups: 2 × 10",plank:"2 × 25 sec",upper:"Standing arm raises: 2 × 12"};
+ if(day<=50)return {day,walk:15,skip:"4 × 40 sec • moderate",push:"Incline push-ups: 3 × 10",sit:"Sit-ups: 3 × 8",plank:"2 × 30 sec",upper:"Wall shoulder taps: 3 × 8/side"};
+ return {day,walk:15,skip:"5 × 45 sec • moderate • 30–45 sec rest",push:"Low incline push-ups: 3 × 8–10",sit:"Sit-ups: 3 × 10",plank:"3 × 30 sec",upper:"Standing arm raises: 3 × 12"};
+}
+function renderStamina(d){
+ const p=staminaPlan(Math.min(60,Math.max(1,d)));
+ const items=[
+  ['walk','Walking',`${p.walk} min • comfortable/brisk pace`],
+  ['skip','Rope skipping',p.skip],
+  ['push','Push-ups',p.push],
+  ['sit','Sit-ups',p.sit],
+  ['plank','Plank',p.plank],
+  ['upper','Easy upper-body',p.upper]
+ ];
+ let html=`<div class="card"><div class="row"><div><h2>🏃 Stamina — 30 min</h2><div class="small">Beginner progression • Day ${Math.min(60,d)} / 60</div></div><span class="pill">MAX 30 MIN</span></div>`;
+ for(const [id,name,dose] of items){
+   const disabled=d>60 || dose==="None";
+   const ck=checked(d,'stamina_'+id);
+   html+=`<div class="exercise"><div class="row"><div style="flex:1"><b>${name}</b><div class="dose">${dose}</div></div><input type="checkbox" ${ck?'checked':''} ${disabled?'disabled':''} onchange="toggle('${key(d,'stamina_'+id)}',this.checked)"></div></div>`;
+ }
+ html+=`<div class="small" style="margin-top:10px">Start easy. If form breaks down or you feel pain, stop and keep the next session at the previous comfortable level. Rest between sets as needed.</div></div>`;
+ return html;
+}
+function today(){
+ const d=studyDay(), apt=aptNewForDay(d), gk=gkRange(d), odd=d%2===1;
+ let newTasks=[];
+ if(apt)newTasks.push(['apt_new',`${apt.name} — new learning`,`Segment ${apt.index+1} of ${apt.days}`,`${apt.minutes} min`]);
+ if(gk!=='First pass complete')newTasks.push(['gk_new',gk,apt?'New GK pages':'Aptitude complete → GK acceleration',apt?'17 min':'62 min']);
+ newTasks.push(['vocab_new','10 new vocabulary words','Learn + write your own examples','10 min']);
+ newTasks.push(['english',odd?'1 RC passage':'1 Close Test',odd?'Odd study day':'Even study day','12 min']);
+ let done=newTasks.filter(t=>checked(d,t[0])).length;
+ const horizon=Math.max(142,aptCompletedStudyDay()+50);
+ const percent=pct(done,newTasks.length);
+ document.getElementById('today').innerHTML=`
+ <div class="daynav"><button onclick="moveDay(-1)" aria-label="Previous day">‹</button><div class="day-title"><b>Day ${d} of ${horizon}</b><div class="sub">${done}/${newTasks.length} completed</div></div><button onclick="moveDay(1)" aria-label="Next day">›</button></div>
+ <div class="card">
+   <div class="hero-progress">
+     <div class="hero-left"><div class="eyebrow">TODAY</div><div class="big">${done}/${newTasks.length}</div><div class="caption">New-learning check-in</div></div>
+     <div class="progress-ring" style="--progress:${percent}%"><span>${percent}%</span></div>
+   </div>
+   <div class="bar compact-progress"><i style="width:${percent}%"></i></div>
+ </div>
+ <div class="card">
+   <div class="new-head"><span class="emoji">📘</span><h2>New learning — 84 min</h2></div>
+   <div class="new-sub">Only today's new-learning work is shown here</div>
+   ${newTasks.map(x=>task(d,x[0],x[1],x[2],x[3])).join('')}
+ </div>
+ ${renderStamina(d)}
+ <div class="card"><h2>📝 Daily check-in</h2><div class="small" style="margin-bottom:10px">Revision is self-managed and intentionally not shown in the app.</div><div class="row"><label>Actual new-learning minutes <input id="actualMin" type="number" min="0" max="84" value="${S.actualMin[d]||''}" placeholder="0–84"></label><button class="primary" onclick="saveActual(${d})">Save</button></div><textarea id="note" style="width:100%;margin-top:12px;min-height:80px;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px" placeholder="What did you complete or struggle with?">${esc(S.notes[d]||'')}</textarea><button style="margin-top:8px" onclick="saveNote(${d})">Save note</button></div>
+ <div style="text-align:center;margin:14px 0 24px"><button onclick="openSection('progress')">View full progress →</button></div>`;
+}
+function saveActual(d){S.actualMin[d]=Number(document.getElementById('actualMin').value||0);save();render();}
+function saveNote(d){S.notes[d]=document.getElementById('note').value;save();}
+function moveDay(n){S.actualStudyDay=Math.max(1,Math.min(Math.max(142,aptCompletedStudyDay()+50),studyDay()+n));save();render();}
+function progress(){
+ const current=studyDay(), aptDays=Math.max(0,Math.min(Math.ceil(APT_TOTAL_MIN/APT_NEW_MIN),current-3));
+ const aptMinutes=Math.min(APT_TOTAL_MIN,aptDays*APT_NEW_MIN);
+ const gkDone=gkPagesByDay(current+1);
+ const horizon=Math.max(142,aptCompletedStudyDay()+50);
+ document.getElementById('progress').innerHTML=`
+ <div class="card"><h2>Overall progress</h2><div class="metric">${Math.min(100,Math.round((current-1)/horizon*100))}%</div><div class="bar"><i style="width:${Math.min(100,(current-1)/horizon*100)}%"></i></div><div class="small" style="margin-top:8px">Day ${current} • Aptitude new learning completes around Day ${aptCompletedStudyDay()}</div></div>
+ <div class="grid3"><div class="card"><div class="small">APTITUDE</div><div class="metric">${Math.round(aptMinutes/APT_TOTAL_MIN*100)}%</div><div class="small">${Math.round(aptMinutes)} / ${APT_TOTAL_MIN} min</div></div><div class="card"><div class="small">GK</div><div class="metric">${Math.round(gkDone/830*100)}%</div><div class="small">${gkDone} / 830 pages</div></div><div class="card"><div class="small">VOCABULARY</div><div class="metric">${Math.max(0,current-1)*10}</div><div class="small">new words introduced</div></div></div>
+ <div class="card"><h2>Aptitude topics</h2>${aptitude.map((a,i)=>{let start=4+aptitude.slice(0,i).reduce((s,x)=>s+x[2],0);let done=current>=start+a[2];return `<div class="task"><div style="flex:1"><b>${a[0]}</b><div class="small">${done?'Completed':'Planned'} • ${Math.ceil(a[2]/APT_NEW_MIN)} study-day segments</div></div><span class="pill ${done?'ok':''}">${done?'✓':''}</span></div>`}).join('')}</div>
+ <div class="card"><h2>🏃 Stamina — 60-day progression</h2><div class="small">Up to 30 minutes/day; gradual introduction for 60 days, then maintain the final comfortable level.</div><div class="bar" style="margin-top:10px"><i style="width:${Math.min(100,current/60*100)}%"></i></div><div class="small" style="margin-top:6px">Day ${Math.min(60,current)} / 60</div></div>
+ <div class="card"><h2>GK notebooks</h2>${gkBooks.map((b,i)=>{let before=gkBooks.slice(0,i).reduce((s,x)=>s+x[1],0);let got=Math.max(0,Math.min(b[1],gkDone-before));return `<div class="task"><div style="flex:1"><b>${b[0]}</b><div class="bar" style="margin-top:6px"><i style="width:${got/b[1]*100}%"></i></div></div><span class="small">${got}/${b[1]}</span></div>`}).join('')}</div>`;
+}
+function plan(){
+ const totalDays=Math.max(142,aptCompletedStudyDay()+50);
+ let rows='';
+ for(let d=1;d<=totalDays;d++){
+  let apt=aptNewForDay(d), status=dayStatus(d);
+  rows+=`<tr><td>${d}</td><td>${d<=3?'Initial reactivation':apt?apt.name:'Aptitude complete → GK acceleration'}</td><td>${gkRange(d)}</td><td>${d%2?'RC':'Close Test'}</td><td>${status}</td></tr>`;
+ }
+ document.getElementById('plan').innerHTML=`<div class="card"><h2>Master Plan</h2><div class="small">84 min new learning/day. While Aptitude is active: 45m Aptitude + 17m GK + 10m vocabulary + 12m English. After Aptitude: the 45m transfers to GK. Stamina is separate.</div></div><div class="card" style="overflow:auto"><table><thead><tr><th>Day</th><th>Aptitude</th><th>GK</th><th>English</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function settings(){
+ document.getElementById('settings').innerHTML=`<div class="card"><h2>Data</h2><p class="small">Your progress is stored in this browser using localStorage.</p>
+ <button onclick="exportData()">Export backup</button> <label><button>Import backup</button><input id="imp" type="file" accept=".json" style="display:none" onchange="importData(this.files[0])"></label>
+ <button class="danger" onclick="resetData()" style="float:right">Reset all progress</button></div>
+ <div class="card"><h2>Core rules</h2><ul class="small"><li>210 min study limit: 126 min self-managed revision + 84 min new learning</li><li>New learning while Aptitude is active: ~45m Aptitude + 17m GK + 10m vocabulary + 12m English</li><li>After Aptitude finishes, its ~45m transfers to GK</li><li>Stamina is separate: up to 30 min/day with gradual 60-day progression</li><li>6 study days/week; Sundays are buffer/rest</li><li>10 vocabulary daily; odd = RC, even = Close Test</li><li>After Aptitude new learning ends, its time transfers to GK</li></ul></div>`;
+}
+function exportData(){let blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='study-checkin-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(f){if(!f)return;let r=new FileReader();r.onload=()=>{try{S=JSON.parse(r.result);save();render()}catch(e){alert('Invalid backup')}};r.readAsText(f)}
+function resetData(){if(confirm('Delete all saved progress from this browser?')){S=fresh();save();render()}}
+function toggleMenu(open){document.getElementById('menuBackdrop').classList.toggle('open',!!open)}
+function openSection(tab){
+  document.querySelectorAll('main>section').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(tab).classList.remove('hidden');
+  toggleMenu(false);
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function render(){today();progress();plan();settings()}
+render();
+</script>
+</body></html>
